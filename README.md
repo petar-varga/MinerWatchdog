@@ -1,0 +1,2 @@
+# MinerWatchdog
+Mining restart watchdog
