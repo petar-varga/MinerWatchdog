@@ -88,20 +88,22 @@ def check_status():
         "date_last_pinged": str(date_ping_sent),
     })
 
-@endpoints.route("/all_active", methods=["POST"])
-def all_active():
+@endpoints.route("/all_currently_performing", methods=["POST"])
+def all_currently_performing():
     responses = db_read("""SELECT * FROM `session` 
-    WHERE `status` = 'active'""")
+    WHERE `status` != 'active'""")
 
     response_return_object = []
     for response_single in responses:
         pc_identifier = response_single["pc_identifier"]
         session_id = response_single["id"]
         date_initiated = response_single["date_initiated"]
+        current_status = response_single["status"]
         response_return_object.append({
             "pc_identifier": pc_identifier,
             "session_id": session_id,
-            "date_initiated": str(date_initiated)
+            "date_initiated": str(date_initiated),
+            "status": current_status
         })
 
     return jsonify({
