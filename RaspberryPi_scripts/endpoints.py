@@ -38,11 +38,17 @@ def create_session():
 def ping():
     details = request.json["details"]
     session_id = request.json["session_id"]
+    hashrate = request.json["hashrate"]
 
-    inserted_id = db_insert_id("""INSERT INTO `ping` 
-    (`id`, `session_id`, `details`, `date_sent`) 
-    VALUES (NULL, %s, %s, NOW())""", (session_id, details))
-
+    if hashrate != "":
+        inserted_id = db_insert_id("""INSERT INTO `ping` 
+        (`id`, `session_id`, `hashrate_mhs`, `details`, `date_sent`) 
+        VALUES (NULL, %s, %s, %s, NOW())""", (session_id, hashrate, details))
+    else:
+        inserted_id = db_insert_id("""INSERT INTO `ping` 
+        (`id`, `session_id`, `details`, `date_sent`) 
+        VALUES (NULL, %s, %s, NOW())""", (session_id, details))
+        
     return jsonify({
         "status": inserted_id != None,
         "inserted_id": inserted_id
