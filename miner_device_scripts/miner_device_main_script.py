@@ -2,6 +2,7 @@ import requests
 import json
 import time
 import socket
+import ClaymoreRPC
 
 def create_session_call():
     url = "http://192.168.31.200:5000/endpoints/create_session"
@@ -31,6 +32,8 @@ def ping_server(session_id, details):
     }
     response = requests.request("POST", url, headers=headers, data=payload)
 
+def get_mining_data(claymore_miner_object):
+    return claymore_miner_object.unified_data()
 
 returned_object = create_session_call()
 
@@ -42,6 +45,17 @@ print("successful session creation!")
 session_id = returned_object["inserted_id"]
 print("Session id:", session_id)
 
+claymore_miner = ClaymoreRPC.ClaymoreRPC("192.168.31.150", 8080)
+
 while True:
-    ping_server(session_id, "hashrate here")
+    try:
+        mining_data = get_mining_data(claymore_miner)
+    except:
+        print("Claymore API interface failed")
+        time.sleep(10)
+        continue
+
+    # should divide by million to get MH/s
+    hashrate = mining_data["total_hashrate"] / 1_000_000
+    ping_server(session_id, str(hashrate))
     time.sleep(30)
