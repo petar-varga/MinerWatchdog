@@ -45,12 +45,12 @@ def destroy_session():
     session_id = request.json["session_id"]
 
     updated = db_write("""UPDATE `session` 
-    SET `status` = 'ended',  `status` = NOW() 
+    SET `status` = 'ended',  `date_ended` = NOW() 
     WHERE `session`.`id` = %s""", (session_id, ))
 
     insert_action_id = db_write("""INSERT INTO `action_log` 
     (`id`, `id_session`, `action_type`, `date_initiated`) 
-    VALUES ('', %s, 'restart_auto', NOW())""", (session_id, ))
+    VALUES (NULL, %s, 'restart_auto', NOW())""", (session_id, ))
 
     # start a thread which starts the GPIO interface script
     x = threading.Thread(target=restart)
