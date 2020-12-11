@@ -91,7 +91,7 @@ def check_status():
 @endpoints.route("/all_currently_performing", methods=["POST"])
 def all_currently_performing():
     responses = db_read("""SELECT * FROM `session` 
-    WHERE `status` != 'active'""")
+    WHERE `status` != 'ended'""")
 
     response_return_object = []
     for response_single in responses:
