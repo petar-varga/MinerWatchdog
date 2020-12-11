@@ -1,4 +1,5 @@
 from os import abort
+import threading
 import time
 from flask import Blueprint, request, Response, jsonify
 from flask import json
@@ -10,6 +11,7 @@ from threading import Thread
 from utils import (
     db_insert_id, db_read, db_write, db_write_executemany
 )
+from GPIO_Interface_script import restart
 
 endpoints = Blueprint("endpoints", __name__)
 
@@ -51,7 +53,8 @@ def destroy_session():
     VALUES ('', %s, 'restart_auto', NOW())""", (session_id, ))
 
     # start a thread which starts the GPIO interface script
-
+    x = threading.Thread(target=restart)
+    x.start()
     return jsonify({
         "status_session_updated": updated != None,
         "action_executed": insert_action_id != None
