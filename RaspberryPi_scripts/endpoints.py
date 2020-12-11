@@ -13,6 +13,14 @@ from utils import (
 )
 from GPIO_Interface_script import restart
 
+def get_matching_raspberry_pi_pin(pc_identifier):
+    response = db_read("""SELECT * FROM `hw_info` 
+    WHERE `pc_identifier` LIKE %s""", (pc_identifier, ))
+
+    valid_response = response[0]
+    raspberry_pin = int(valid_response["raspberry_pi_pin"])
+    return raspberry_pin
+
 endpoints = Blueprint("endpoints", __name__)
 
 @endpoints.route("/create_session", methods=["POST"])
@@ -43,6 +51,7 @@ def ping():
 @endpoints.route("/end_session", methods=["POST"])
 def destroy_session():
     session_id = request.json["session_id"]
+    pc_identifier = request.json["pc_identifier"]
 
     updated = db_write("""UPDATE `session` 
     SET `status` = 'ended',  `date_ended` = NOW() 
@@ -52,8 +61,10 @@ def destroy_session():
     (`id`, `id_session`, `action_type`, `date_initiated`) 
     VALUES (NULL, %s, 'restart_auto', NOW())""", (session_id, ))
 
+    raspberry_pin = get_matching_raspberry_pi_pin(pc_identifier)
+
     # start a thread which starts the GPIO interface script
-    x = threading.Thread(target=restart)
+    x = threading.Thread(target=restart, args=(raspberry_pin, ))
     x.start()
     return jsonify({
         "status_session_updated": updated != None,

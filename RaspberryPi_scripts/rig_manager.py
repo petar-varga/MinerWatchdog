@@ -24,11 +24,12 @@ def get_single_active_session_info(session_id):
 
     return json.loads(response.text)
 
-def destroy_session_and_restart(session_id):
+def destroy_session_and_restart(session_id, pc_identifier):
     url = "http://192.168.31.200:5000/endpoints/end_session"
 
     payload = {
-        "session_id": str(session_id)
+        "session_id": str(session_id),
+        "pc_identifier": pc_identifier
     }
     payload = json.dumps(payload)
     headers = {
@@ -66,7 +67,7 @@ if __name__ == "__main__":
 
             if time_passed_in_secs >= 70:
                 print(f"calling the destroy session and restart API call for session_id: {session_id}")
-                destroy_session_and_restart(session_id)
+                destroy_session_and_restart(session_id, pc_identifier)
                 time.sleep(3)
             #print("Session last ping info:", session_last_ping_info)
             #print("Time delta between last ping:", date_delta_last_ping)

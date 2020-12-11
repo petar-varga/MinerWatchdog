@@ -5,12 +5,8 @@ from utils import (
 )
 
 
-def restart(pc_identifier):
-    response = db_read("""SELECT *  FROM `hw_info` 
-    WHERE `pc_identifier` LIKE %s""", (pc_identifier, ))
-
-    valid_response = response[0]
-    raspberry_pin = int(valid_response["raspberry_pi_pin"])
+def restart(raspberry_pin):
+    
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(raspberry_pin, GPIO.OUT)
 
@@ -24,13 +20,7 @@ def restart(pc_identifier):
     GPIO.output(raspberry_pin, GPIO.LOW)
     GPIO.cleanup()
 
-def start(pc_identifier):
-    response = db_read("""SELECT *  FROM `hw_info` 
-    WHERE `pc_identifier` LIKE %s""", (pc_identifier, ))
-
-    valid_response = response[0]
-    raspberry_pin = int(valid_response["raspberry_pi_pin"])
-
+def start(raspberry_pin):
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(raspberry_pin, GPIO.OUT)
 
@@ -45,4 +35,4 @@ def start(pc_identifier):
     GPIO.cleanup()
 
 if __name__ == "__main__":
-    restart()
+    restart("DESKTOP-E9B2NU2")
