@@ -60,3 +60,40 @@ def destroy_session():
         "action_executed": insert_action_id != None
     })
 
+@endpoints.route("/check_status", methods=["POST"])
+def check_status():
+    session_id = request.json["session_id"]
+
+    response_single = db_read("""SELECT * FROM `ping` 
+    WHERE `session_id` = %s 
+    ORDER BY `ping`.`date_sent` DESC 
+    LIMIT 1""", (session_id, ))[0]
+
+    details = response_single["details"]
+    date_ping_sent = response_single["date_sent"]
+
+    return jsonify({
+        "details": details,
+        "date_last_pinged": str(date_ping_sent),
+    })
+
+@endpoints.route("/all_active", methods=["POST"])
+def all_active():
+    responses = db_read("""SELECT * FROM `session` 
+    WHERE `status` = 'active'""")
+
+    response_return_object = []
+    for response_single in responses:
+        pc_identifier = response_single["pc_identifier"]
+        session_id = response_single["id"]
+        date_initiated = response_single["date_initiated"]
+        response_return_object.append({
+            "pc_identifier": pc_identifier,
+            "session_id": session_id,
+            "date_initiated": str(date_initiated)
+        })
+
+    return jsonify({
+        "active_sessions": response_return_object
+    })
+
