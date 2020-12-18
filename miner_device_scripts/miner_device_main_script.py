@@ -19,13 +19,14 @@ def create_session_call():
 
     return json.loads(response.text)
 
-def ping_server(session_id, details, hashrate=""):
+def ping_server(session_id, details, hashrate="", temperature=""):
     url = "http://192.168.31.200:5000/endpoints/ping"
 
     payload={
         "details": details,
         "session_id": session_id,
-        "hashrate": hashrate
+        "hashrate": hashrate,
+        "temperature": temperature
     }
     payload = json.dumps(payload)
     headers = {
@@ -44,20 +45,23 @@ if returned_object["status"] != True:
     
 print("successful session creation!")
 session_id = returned_object["inserted_id"]
-ping_server(session_id, "first ping - init")
+ping_server(session_id, "init ping")
 print("Session id:", session_id)
 
-claymore_miner = ClaymoreRPC.ClaymoreRPC("192.168.31.150", 8080)
+claymore_miner = ClaymoreRPC.ClaymoreRPC("192.168.31.105", 4000)
 
 while True:
     try:
         mining_data = get_mining_data(claymore_miner)
+        
     except:
         print("Claymore API interface failed")
         time.sleep(10)
         continue
 
     # should divide by million to get MH/s
-    hashrate = mining_data["total_hashrate"] / 1_000_000
-    ping_server(session_id, "all good", str(hashrate))
+    hashrate = mining_data["total hashrate"] / 1_000_000
+    temp = mining_data["GPUs"]["GPU 0"]["temp"]
+    print(hashrate, temp)
+    ping_server(session_id, "all good", str(hashrate), str(temp))
     time.sleep(30)

@@ -39,11 +39,12 @@ def ping():
     details = request.json["details"]
     session_id = request.json["session_id"]
     hashrate = request.json["hashrate"]
+    temperature = request.json["temperature"]
 
-    if hashrate != "":
+    if hashrate != "" and temperature != "":
         inserted_id = db_insert_id("""INSERT INTO `ping` 
-        (`id`, `session_id`, `hashrate_mhs`, `details`, `date_sent`) 
-        VALUES (NULL, %s, %s, %s, NOW())""", (session_id, hashrate, details))
+        (`id`, `session_id`, `hashrate_mhs`, `temperature`, `details`, `date_sent`) 
+        VALUES (NULL, %s, %s, %s, %s, NOW())""", (session_id, hashrate, temperature, details))
     else:
         inserted_id = db_insert_id("""INSERT INTO `ping` 
         (`id`, `session_id`, `details`, `date_sent`) 

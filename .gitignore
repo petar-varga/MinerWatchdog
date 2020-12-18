@@ -128,3 +128,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 RaspberryPi_scripts/.vscode/settings.json
+miner_device_scripts/test.py
