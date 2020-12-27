@@ -135,9 +135,9 @@ class ClaymoreRPC(object):
         else:
             self.authorized = False
 
-    def getstat1(self):
-        """Implementation of the getstats1 method."""
-        self.write("miner_getstat1")
+    def getstat2(self):
+        """Implementation of the getstats2 method."""
+        self.write("miner_getstat2")
         raw_response = self.read()["result"]
         return raw_response
 
@@ -167,6 +167,7 @@ class ClaymoreRPC(object):
             },
             "uptime": response["miner"]["runtime"],
             "version": response["miner"]["version"],
+            "power consumption": response["miner"]["total_power_consumption"],
             "GPUs": response["GPUs"],
         }
 
@@ -203,7 +204,7 @@ class ClaymoreRPC(object):
             Formatted API response. Check code for keys.
         """
 
-        raw_response = self.getstat1()
+        raw_response = self.getstat2()
         response = {
             "miner": dict(),
             "eth_pool": dict(),
@@ -212,6 +213,7 @@ class ClaymoreRPC(object):
         }
 
         response["miner"]["version"] = raw_response[0]
+        response["miner"]["total_power_consumption"] = raw_response[17]
         hours = int(raw_response[1]) // 60
         minutes = int(raw_response[1]) % 60
         response["miner"]["runtime"] = "{:02d}:{:02d}".format(hours, minutes)
@@ -267,7 +269,7 @@ class ClaymoreRPC(object):
             }
         response["miner"]["ip"] = self.ip
         response["miner"]["port"] = self.port
-
+        
         return response
 
 class EthminerRPC(ClaymoreRPC):
